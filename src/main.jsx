@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 // import Game from './App';
 import { useState } from 'react';
+import './stylesheet.css';
 
 function Square({ value, onSquareClick }) {
   return (
@@ -79,16 +80,16 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
-  const moves = history.map((squares, move) => {
-    let description;
-    if (move > 0) {
-      description = 'Go to move #' + move;
-    } else {
-      description = 'Go to game start';
-    }
+  function resetGame() {
+    setHistory([Array(16).fill(null)]);
+    setCurrentMove(0);
+  }
+
+  const moves = history.slice(1).map((squares, move) => {
+    const actualMove = move + 1;
     return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
+      <li key={actualMove}>
+        <button onClick={() => jumpTo(actualMove)}>Go to move #{actualMove}</button>
       </li>
     );
   });
@@ -97,6 +98,12 @@ export default function Game() {
     <div className="game">
       <div className="game-board">
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <button 
+          onClick={resetGame}
+          className="reset-button"
+        >
+          Reset Game
+        </button>
       </div>
       <div className="game-info">
         <ol>{moves}</ol>
