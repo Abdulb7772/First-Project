@@ -1,5 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { useState, useEffect } from 'react';
+import Sessions from './components/sessions';
+import RunGame from './components/rungame';
 import './stylesheet.css';
 
 function Square({ value, onSquareClick, isWinning }) {
@@ -190,120 +192,41 @@ export default function Game() {
     const actualMove = move + 1;
   });
 
-  const winner = calculateWinner(currentSquares);
+  const result = calculateWinner(currentSquares, boardSize);
+  const winner = result?.winner;
+  const isDraw = !result && currentSquares.every(square => square !== null);
+  const isGameOver = winner || isDraw;
   const currentSession = sessions.find(s => s.id === currentSessionId);
 
+  
   return (
     <div className="game-container">
-      <div className="sessions-panel">
-        <h2 className="sessions-title">Game Sessions</h2>
-        <button onClick={showSizePicker} className="new-session-button">
-          + New Game
-        </button>
-        
-        {showSizeSelector && (
-          <div className="size-selector-modal">
-            <h3>Select Board Size</h3>
-            <div className="size-buttons">
-              <button onClick={() => createNewSession(3)} className="size-button">
-                3x3
-              </button>
-              <button onClick={() => createNewSession(4)} className="size-button">
-                4x4
-              </button>
-              <button onClick={() => createNewSession(5)} className="size-button">
-                5x5
-              </button>
-            </div>
-            <button onClick={() => setShowSizeSelector(false)} className="cancel-button">
-              Cancel
-            </button>
-          </div>
-        )}
-        
-        <div className="sessions-list">
-          {sessions.map((session) => {
-            const sessionSquares = session.history[session.currentMove];
-            const sessionResult = calculateWinner(sessionSquares, session.boardSize || 4);
-            const sessionWinner = sessionResult?.winner;
-            const sessionDraw = !sessionResult && sessionSquares.every(square => square !== null);
-            
-            return (
-              <div 
-                key={session.id} 
-                className={`session-card ${currentSessionId === session.id ? 'active' : ''}`}
-              >
-                <div className="session-header">
-                  <h3>{session.name}</h3>
-                  {sessionWinner && <span className="winner-badge">Winner: {sessionWinner}</span>}
-                  {sessionDraw && <span className="draw-badge">Draw</span>}
-                </div>
-                <p className="session-info">
-                  Moves: {session.currentMove} | Last played: {new Date(session.lastPlayed).toLocaleString()}
-                </p>
-                <div className="session-actions">
-                  <button 
-                    onClick={() => loadSession(session.id)}
-                    className="load-button"
-                  >
-                    Load
-                  </button>
-                  <button 
-                    onClick={() => deleteSession(session.id)}
-                    className="delete-button"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-          {sessions.length === 0 && (
-            <p className="empty-message">No saved games. Create a new game to start!</p>
-          )}
-        </div>
-      </div>
-
-      <div className="game">
-        {currentSessionId ? (
-          <>
-            <div className="game-board">
-              <h2 className="current-game-title">{currentSession?.name}</h2>
-              <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} boardSize={boardSize} />
-              <div className="game-controls">
-                <button 
-                  onClick={undo}
-                  disabled={currentMove === 0}
-                  className="undo-button"
-                >
-                  ⟲
-                </button>
-                <button 
-                  onClick={redo}
-                  disabled={currentMove === history.length - 1}
-                  className="redo-button"
-                >
-                  ⟳
-                </button>
-              </div>
-              <button 
-                onClick={resetGame}
-                className="reset-button"
-              >
-                Reset
-              </button>
-            </div>
-            <div className="game-info">
-              <ol>{moves}</ol>
-            </div>
-          </>
-        ) : (
-          <div className="no-session">
-            <h2>No game selected</h2>
-            <p>Create a new game or load an existing one from the sidebar</p>
-          </div>
-        )}
-      </div>
+      <Sessions 
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        showSizeSelector={showSizeSelector}
+        showSizePicker={showSizePicker}
+        createNewSession={createNewSession}
+        setShowSizeSelector={setShowSizeSelector}
+        loadSession={loadSession}
+        deleteSession={deleteSession}
+        calculateWinner={calculateWinner}
+      />
+      <RunGame 
+        currentSessionId={currentSessionId}
+        currentSession={currentSession}
+        xIsNext={xIsNext}
+        currentSquares={currentSquares}
+        handlePlay={handlePlay}
+        boardSize={boardSize}
+        resetGame={resetGame}
+        undo={undo}
+        redo={redo}
+        currentMove={currentMove}
+        history={history}
+        Board={Board}
+        isGameOver={isGameOver}
+      />
     </div>
   );
 }

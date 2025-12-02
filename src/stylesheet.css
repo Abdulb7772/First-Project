@@ -349,6 +349,19 @@
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.4);
 }
 
+.reset-button:disabled {
+  background: linear-gradient(135deg, rgb(209 213 219), rgb(156 163 175));
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+}
+
+.reset-button:disabled:hover {
+  background: linear-gradient(135deg, rgb(209 213 219), rgb(156 163 175));
+  transform: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .game-controls {
   display: flex;
   gap: 0.75rem;
