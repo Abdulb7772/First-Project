@@ -42,7 +42,7 @@ export default function RunGame({
             </div>
             <button 
               onClick={resetGame}
-              disabled={currentMove === history.length - 1 || isGameOver}
+              disabled={currentMove === 0 && history.length === 1 || isGameOver}
               className="reset-button"
             >
               Reset
