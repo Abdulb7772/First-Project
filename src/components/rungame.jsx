@@ -11,7 +11,9 @@ export default function RunGame({
   currentMove, 
   history, 
   Board,
-  isGameOver
+  isGameOver,
+  playerXName,
+  playerOName
 }) {
   const moves = history.slice(1).map((squares, move) => {
     const actualMove = move + 1;
@@ -23,7 +25,14 @@ export default function RunGame({
         <>
           <div className="game-board">
             <h2 className="current-game-title">{currentSession?.name}</h2>
-            <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} boardSize={boardSize} />
+            <Board 
+              xIsNext={xIsNext} 
+              squares={currentSquares} 
+              onPlay={handlePlay} 
+              boardSize={boardSize}
+              playerXName={playerXName}
+              playerOName={playerOName}
+            />
             <div className="game-controls">
               <button 
                 onClick={undo}

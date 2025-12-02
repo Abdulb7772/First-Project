@@ -15,7 +15,7 @@ function Square({ value, onSquareClick, isWinning }) {
   );
 }
 
-function Board({ xIsNext, squares, onPlay, boardSize }) {
+function Board({ xIsNext, squares, onPlay, boardSize, playerXName, playerOName }) {
   function handleClick(i) {
     const result = calculateWinner(squares, boardSize);
     const isDraw = squares.every(square => square !== null);
@@ -40,11 +40,13 @@ function Board({ xIsNext, squares, onPlay, boardSize }) {
   
   let status;
   if (winner) {
-    status = 'Winner: ' + winner;
+    const winnerName = winner === 'X' ? playerXName : playerOName;
+    status = 'Winner: ' + winnerName;
   } else if (isDraw) {
     status = "It's a Draw!";
   } else {
-    status = 'Player ' + (xIsNext ? 'X' : 'O') + '\'s turn';
+    const currentPlayerName = xIsNext ? playerXName : playerOName;
+    status = currentPlayerName + '\'s turn ' + (xIsNext ? '\"X\"' : '\"O\"');
   }
 
   const rows = [];
@@ -90,6 +92,10 @@ export default function Game() {
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [boardSize, setBoardSize] = useState(4);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
+  const [showNameInput, setShowNameInput] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(4);
+  const [playerXName, setPlayerXName] = useState('');
+  const [playerOName, setPlayerOName] = useState('');
   const [history, setHistory] = useState([Array(16).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
@@ -120,12 +126,25 @@ export default function Game() {
     setShowSizeSelector(true);
   }
 
-  function createNewSession(size) {
+  function handleCreateWithNames() {
+    if (!playerXName.trim() || !playerOName.trim()) {
+      alert('Please enter both player names');
+      return;
+    }
+    createNewSession(selectedSize, playerXName, playerOName);
+    setShowNameInput(false);
+    setPlayerXName('');
+    setPlayerOName('');
+  }
+
+  function createNewSession(size, xName, oName) {
     const totalSquares = size * size;
     const newSession = {
       id: Date.now(),
       name: `Game ${sessions.length + 1} (${size}x${size})`,
       boardSize: size,
+      playerXName: xName,
+      playerOName: oName,
       history: [Array(totalSquares).fill(null)],
       currentMove: 0,
       createdAt: new Date().toISOString(),
@@ -136,7 +155,6 @@ export default function Game() {
     setBoardSize(size);
     setHistory(newSession.history);
     setCurrentMove(newSession.currentMove);
-    setShowSizeSelector(false);
   }
 
   function loadSession(sessionId) {
@@ -211,6 +229,14 @@ export default function Game() {
         loadSession={loadSession}
         deleteSession={deleteSession}
         calculateWinner={calculateWinner}
+        showNameInput={showNameInput}
+        setShowNameInput={setShowNameInput}
+        setSelectedSize={setSelectedSize}
+        playerXName={playerXName}
+        setPlayerXName={setPlayerXName}
+        playerOName={playerOName}
+        setPlayerOName={setPlayerOName}
+        handleCreateWithNames={handleCreateWithNames}
       />
       <RunGame 
         currentSessionId={currentSessionId}
@@ -226,6 +252,8 @@ export default function Game() {
         history={history}
         Board={Board}
         isGameOver={isGameOver}
+        playerXName={currentSession?.playerXName || 'Player X'}
+        playerOName={currentSession?.playerOName || 'Player O'}
       />
     </div>
   );

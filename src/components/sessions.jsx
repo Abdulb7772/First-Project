@@ -7,7 +7,16 @@ export default function Sessions({
   setShowSizeSelector, 
   loadSession, 
   deleteSession, 
-  calculateWinner 
+  calculateWinner,
+  showNameInput,
+  setShowNameInput,
+  selectedSize,
+  setSelectedSize,
+  playerXName,
+  setPlayerXName,
+  playerOName,
+  setPlayerOName,
+  handleCreateWithNames
 }) {
   return (
     <div className="sessions-panel">
@@ -20,18 +29,52 @@ export default function Sessions({
         <div className="size-selector-modal">
           <h3>Select Board Size</h3>
           <div className="size-buttons">
-            <button onClick={() => createNewSession(3)} className="size-button">
+            <button onClick={() => { setSelectedSize(3); setShowSizeSelector(false); setShowNameInput(true); }} className="size-button">
               3x3
             </button>
-            <button onClick={() => createNewSession(4)} className="size-button">
+            <button onClick={() => { setSelectedSize(4); setShowSizeSelector(false); setShowNameInput(true); }} className="size-button">
               4x4
             </button>
-            <button onClick={() => createNewSession(5)} className="size-button">
+            <button onClick={() => { setSelectedSize(5); setShowSizeSelector(false); setShowNameInput(true); }} className="size-button">
               5x5
             </button>
           </div>
           <button onClick={() => setShowSizeSelector(false)} className="cancel-button">
             Cancel
+          </button>
+        </div>
+      )}
+
+      {showNameInput && (
+        <div className="size-selector-modal">
+          <h3>Enter Player Names</h3>
+          <div className="name-inputs">
+            <div className="input-group">
+              <label>Player X Name:</label>
+              <input 
+                type="text" 
+                value={playerXName} 
+                onChange={(e) => setPlayerXName(e.target.value)}
+                placeholder="Enter Player X name"
+                className="player-name-input"
+              />
+            </div>
+            <div className="input-group">
+              <label>Player O Name:</label>
+              <input 
+                type="text" 
+                value={playerOName} 
+                onChange={(e) => setPlayerOName(e.target.value)}
+                placeholder="Enter Player O name"
+                className="player-name-input"
+              />
+            </div>
+          </div>
+          <button onClick={handleCreateWithNames} className="size-button">
+            Start Game
+          </button>
+          <button onClick={() => { setShowNameInput(false); setShowSizeSelector(true); }} className="cancel-button">
+            Back
           </button>
         </div>
       )}

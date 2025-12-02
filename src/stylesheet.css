@@ -69,14 +69,20 @@
 
 .size-button {
   flex: 1;
+  width: 8rem;
+  height: 3rem;
   padding: 1rem;
   background: linear-gradient(135deg, rgb(59 130 246), rgb(37 99 235));
   color: white;
   border: none;
   border-radius: 0.5rem;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 700;
+  text-align: center;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   transition: all 0.2s ease;
 }
 
@@ -100,6 +106,43 @@
 
 .cancel-button:hover {
   background: rgb(209 213 219);
+}
+
+.name-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.input-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(55 65 81);
+}
+
+.player-name-input {
+  padding: 0.625rem 0.75rem;
+  border: 2px solid rgb(209 213 219);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.player-name-input:focus {
+  border-color: rgb(59 130 246);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.player-name-input::placeholder {
+  color: rgb(156 163 175);
 }
 
 .sessions-list {
