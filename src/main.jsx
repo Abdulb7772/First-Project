@@ -2,9 +2,12 @@ import { createRoot } from 'react-dom/client';
 import { useState, useEffect } from 'react';
 import './stylesheet.css';
 
-function Square({ value, onSquareClick }) {
+function Square({ value, onSquareClick, isWinning }) {
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button 
+      className={`square ${isWinning ? 'winning-square' : ''}`} 
+      onClick={onSquareClick}
+    >
       {value}
     </button>
   );
@@ -12,10 +15,10 @@ function Square({ value, onSquareClick }) {
 
 function Board({ xIsNext, squares, onPlay, boardSize }) {
   function handleClick(i) {
-    const winner = calculateWinner(squares, boardSize);
+    const result = calculateWinner(squares, boardSize);
     const isDraw = squares.every(square => square !== null);
     
-    if (winner || isDraw || squares[i]) {
+    if (result || isDraw || squares[i]) {
       return;
     }
     
@@ -28,8 +31,10 @@ function Board({ xIsNext, squares, onPlay, boardSize }) {
     onPlay(nextSquares);
   }
 
-  const winner = calculateWinner(squares, boardSize);
-  const isDraw = !winner && squares.every(square => square !== null);
+  const result = calculateWinner(squares, boardSize);
+  const winner = result?.winner;
+  const winningLine = result?.winningLine || [];
+  const isDraw = !result && squares.every(square => square !== null);
   
   let status;
   if (winner) {
@@ -45,11 +50,13 @@ function Board({ xIsNext, squares, onPlay, boardSize }) {
     const rowSquares = [];
     for (let col = 0; col < boardSize; col++) {
       const index = row * boardSize + col;
+      const isWinning = winningLine.includes(index);
       rowSquares.push(
         <Square 
           key={index} 
           value={squares[index]} 
-          onSquareClick={() => handleClick(index)} 
+          onSquareClick={() => handleClick(index)}
+          isWinning={isWinning}
         />
       );
     }
@@ -181,11 +188,6 @@ export default function Game() {
 
   const moves = history.slice(1).map((squares, move) => {
     const actualMove = move + 1;
-    return (
-      <li key={actualMove}>
-        <button onClick={() => jumpTo(actualMove)}>Go to move #{actualMove}</button>
-      </li>
-    );
   });
 
   const winner = calculateWinner(currentSquares);
@@ -203,6 +205,9 @@ export default function Game() {
           <div className="size-selector-modal">
             <h3>Select Board Size</h3>
             <div className="size-buttons">
+              <button onClick={() => createNewSession(3)} className="size-button">
+                3x3
+              </button>
               <button onClick={() => createNewSession(4)} className="size-button">
                 4x4
               </button>
@@ -219,8 +224,9 @@ export default function Game() {
         <div className="sessions-list">
           {sessions.map((session) => {
             const sessionSquares = session.history[session.currentMove];
-            const sessionWinner = calculateWinner(sessionSquares, session.boardSize || 4);
-            const sessionDraw = !sessionWinner && sessionSquares.every(square => square !== null);
+            const sessionResult = calculateWinner(sessionSquares, session.boardSize || 4);
+            const sessionWinner = sessionResult?.winner;
+            const sessionDraw = !sessionResult && sessionSquares.every(square => square !== null);
             
             return (
               <div 
@@ -270,21 +276,21 @@ export default function Game() {
                   disabled={currentMove === 0}
                   className="undo-button"
                 >
-                  ⟲ Undo
+                  ⟲
                 </button>
                 <button 
                   onClick={redo}
                   disabled={currentMove === history.length - 1}
                   className="redo-button"
                 >
-                  ⟳ Redo
+                  ⟳
                 </button>
               </div>
               <button 
                 onClick={resetGame}
                 className="reset-button"
               >
-                Reset Game
+                Reset
               </button>
             </div>
             <div className="game-info">
@@ -342,7 +348,7 @@ function calculateWinner(squares, boardSize = 4) {
     const line = lines[i];
     const first = squares[line[0]];
     if (first && line.every(index => squares[index] === first)) {
-      return first;
+      return { winner: first, winningLine: line };
     }
   }
   return null;
